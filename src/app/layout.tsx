@@ -5,6 +5,7 @@ import "@fontsource/roboto/300.css"
 import "@fontsource/roboto/400.css"
 import "@fontsource/roboto/500.css"
 import "@fontsource/roboto/700.css"
+import Theme from "~/components/ui/theme"
 
 export const metadata: Metadata = {
   title: "Controle de Finanças",
@@ -21,7 +22,9 @@ export default function RootLayout({
       <head>
         <CssBaseline />
       </head>
-      <body>{children}</body>
+      <body style={{ minHeight: "100vh" }}>
+        <Theme>{children}</Theme>
+      </body>
     </html>
   )
 }
