@@ -1,0 +1,78 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  email              String              @unique
+  accounts           Account[]
+  transactionOrigins TransactionOrigin[]
+  transactions       Transaction[]
+}
+
+model Account {
+  id                 Int                 @id @default(autoincrement())
+  title              String              @db.VarChar(255)
+  ownerId            Int
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  owner              User                @relation(fields: [ownerId], references: [id])
+  transactionOrigins TransactionOrigin[]
+  transactions       Transaction[]
+}
+
+enum CategoryFeature {
+  CREDIT_CARD_INVOICE
+  INCOME
+}
+
+model Category {
+  id           Int              @id @default(autoincrement())
+  title        String           @db.VarChar(255)
+  feature      CategoryFeature?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  transactions Transaction[]
+}
+
+enum TransactionOriginType {
+  BANK_ACCOUNT
+  CREDIT_CARD
+}
+
+model TransactionOrigin {
+  id           Int                   @id @default(autoincrement())
+  title        String                @db.VarChar(255)
+  type         TransactionOriginType
+  accountId    Int
+  ownerId      Int
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  account      Account               @relation(fields: [accountId], references: [id])
+  owner        User                  @relation(fields: [ownerId], references: [id])
+  transactions Transaction[]
+}
+
+model Transaction {
+  id                  Int               @id @default(autoincrement())
+  date                DateTime
+  description         String            @db.Text
+  price               Float
+  accountId           Int
+  transactionOriginId Int
+  categoryId          Int
+  ownerId             Int
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  account             Account           @relation(fields: [accountId], references: [id])
+  transactionOrigin   TransactionOrigin @relation(fields: [transactionOriginId], references: [id])
+  category            Category          @relation(fields: [categoryId], references: [id])
+  owner               User              @relation(fields: [ownerId], references: [id])
+}
